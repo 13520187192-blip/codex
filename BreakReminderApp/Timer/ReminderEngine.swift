@@ -93,7 +93,8 @@ public final class ReminderEngine: ReminderEngineProtocol {
         }
 
         let source = DispatchSource.makeTimerSource(queue: queue)
-        source.schedule(deadline: .now().advanced(by: tickInterval), repeating: tickInterval)
+        let interval = DispatchTimeInterval.milliseconds(max(1, Int((tickInterval * 1000).rounded())))
+        source.schedule(deadline: .now() + interval, repeating: interval)
         source.setEventHandler { [weak self] in
             guard let self else { return }
             self.stateMachine.tick(now: self.nowProvider())
