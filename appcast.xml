@@ -3,10 +3,10 @@
   <channel>
     <title>BreakReminder Updates</title>
     <item>
-      <title>Version 1.1.1</title>
-      <pubDate>Thu, 12 Feb 2026 13:26:14 +0000</pubDate>
-      <sparkle:version>1.1.1</sparkle:version>
-      <enclosure url="https://github.com/13520187192-blip/codex/releases/download/v1.1.1/BreakReminder-1.1.1.zip" length="91163" type="application/octet-stream" />
+      <title>Version 1.1.2</title>
+      <pubDate>Thu, 12 Feb 2026 13:32:27 +0000</pubDate>
+      <sparkle:version>1.1.2</sparkle:version>
+      <enclosure url="https://github.com/13520187192-blip/codex/releases/download/v1.1.2/BreakReminder-1.1.2.zip" length="179730" type="application/octet-stream" />
     </item>
   </channel>
 </rss>
