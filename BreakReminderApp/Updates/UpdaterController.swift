@@ -24,8 +24,8 @@ final class UpdaterController: NSObject, Updating {
 final class UpdaterController: Updating {
     private let releasesURL: URL
 
-    init(releasesURL: URL = URL(string: "https://github.com/<your-user>/break-reminder-macos/releases")!) {
-        self.releasesURL = releasesURL
+    init(releasesURL: URL? = URL(string: "https://github.com/13520187192-blip/codex/releases")) {
+        self.releasesURL = releasesURL ?? URL(string: "https://github.com/13520187192-blip/codex/releases")!
     }
 
     func checkForUpdatesInBackground() {
