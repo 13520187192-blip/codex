@@ -17,9 +17,9 @@ final class SettingsStoreTests: XCTestCase {
         defaults.set("invalid_sound", forKey: "break_reminder.sound_option")
 
         let store = SettingsStore(userDefaults: defaults)
-        XCTAssertEqual(store.workDurationMinutes, ReminderConfig.workDurationRange.upperBound)
-        XCTAssertEqual(store.breakDurationMinutes, ReminderConfig.breakDurationRange.lowerBound)
-        XCTAssertEqual(store.snoozeMinutes, ReminderConfig.snoozeRange.lowerBound)
+        XCTAssertEqual(store.workDurationMinutes, 60)
+        XCTAssertEqual(store.breakDurationMinutes, 1)
+        XCTAssertEqual(store.snoozeMinutes, 1)
         XCTAssertEqual(store.soundVolume, 1.0)
         XCTAssertEqual(store.soundOptionRawValue, ReminderSoundOption.glass.rawValue)
 

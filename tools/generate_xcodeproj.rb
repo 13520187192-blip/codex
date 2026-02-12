@@ -38,6 +38,7 @@ app_target.build_configurations.each do |config|
   config.build_settings['GENERATE_INFOPLIST_FILE'] = 'YES'
   config.build_settings['INFOPLIST_KEY_CFBundleDisplayName'] = 'BreakReminder'
   config.build_settings['INFOPLIST_KEY_LSApplicationCategoryType'] = 'public.app-category.productivity'
+  config.build_settings['INFOPLIST_KEY_LSUIElement'] = 'YES'
   config.build_settings['INFOPLIST_KEY_SUFeedURL'] = 'https://<your-user>.github.io/break-reminder-macos/appcast.xml'
   config.build_settings['INFOPLIST_KEY_SUPublicEDKey'] = 'REPLACE_WITH_SPARKLE_PUBLIC_KEY'
   config.build_settings['PRODUCT_NAME'] = 'BreakReminder'
@@ -81,11 +82,23 @@ end
 
 sound_group = resources_group.new_group('Sounds', 'Sounds')
 localizable_group = resources_group.new_group('Localizable', 'Localizable')
+design_assets_group = app_group.new_group('DesignAssets', 'DesignAssets')
 
 sound_ref = sound_group.new_file('reminder.aiff')
 localizable_ref = localizable_group.new_file('zh-Hans.strings')
 app_target.resources_build_phase.add_file_reference(sound_ref)
 app_target.resources_build_phase.add_file_reference(localizable_ref)
+
+%w[
+  hero.png
+  bg_pattern.png
+  icon_clock.png
+  font_title.ttf
+  font_body.ttf
+].each do |asset_file|
+  ref = design_assets_group.new_file(asset_file)
+  app_target.resources_build_phase.add_file_reference(ref)
+end
 
 tests_group = main_group.new_group('BreakReminderAppTests', 'BreakReminderAppTests')
 %w[

@@ -1,4 +1,6 @@
 import AppKit
+import Combine
+import CoreText
 import Foundation
 import SwiftUI
 
@@ -12,19 +14,25 @@ protocol BreakOverlayPresenting: AnyObject {
 }
 
 @MainActor
-final class AppController: ObservableObject {
+final class ReminderCoordinator: ObservableObject {
     @Published private(set) var currentState: ReminderState = .idle
 
     let settingsStore: SettingsStore
 
-    var primaryActionTitle: String {
+    var menuBarSymbolName: String {
         switch currentState {
         case .idle:
-            return "开始专注"
+            return "clock.badge"
+        case .focusing:
+            return "timer"
+        case .breakDue:
+            return "exclamationmark.circle.fill"
+        case .onBreak:
+            return "cup.and.saucer.fill"
+        case .snoozed:
+            return "zzz"
         case .paused:
-            return "恢复专注"
-        default:
-            return "重新开始"
+            return "pause.circle.fill"
         }
     }
 
@@ -133,6 +141,11 @@ final class AppController: ObservableObject {
         engine.snooze(minutes: settingsStore.snoozeMinutes)
     }
 
+    func openSettingsWindow() {
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     func checkForUpdatesNow() {
         updater.checkForUpdatesManually()
     }
@@ -179,50 +192,215 @@ final class AppController: ObservableObject {
     }
 }
 
-struct MainWindowView: View {
-    @ObservedObject var controller: AppController
+@MainActor
+final class QuickControlViewModel: ObservableObject {
+    private let coordinator: ReminderCoordinator
+    private var cancellables = Set<AnyCancellable>()
+
+    init(coordinator: ReminderCoordinator) {
+        self.coordinator = coordinator
+
+        coordinator.objectWillChange
+            .sink { [weak self] in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
+
+    var menuBarSymbolName: String { coordinator.menuBarSymbolName }
+    var statusLine: String { coordinator.statusLine }
+
+    var primaryActionTitle: String {
+        switch coordinator.currentState {
+        case .idle:
+            return "开始专注"
+        case .paused:
+            return "恢复"
+        default:
+            return "重新开始"
+        }
+    }
+
+    func startOrResume() { coordinator.startOrResume() }
+    func pause() { coordinator.pause() }
+    func beginBreakNow() { coordinator.beginBreakNow() }
+    func snooze() { coordinator.snooze() }
+    func skipCurrentBreak() { coordinator.skipCurrentBreak() }
+    func openSettingsWindow() { coordinator.openSettingsWindow() }
+    func checkForUpdatesNow() { coordinator.checkForUpdatesNow() }
+    func quit() { NSApp.terminate(nil) }
+}
+
+@MainActor
+final class SettingsViewModel: ObservableObject {
+    let settingsStore: SettingsStore
+    private let coordinator: ReminderCoordinator
+    private var cancellables = Set<AnyCancellable>()
+
+    init(coordinator: ReminderCoordinator) {
+        self.coordinator = coordinator
+        settingsStore = coordinator.settingsStore
+
+        coordinator.objectWillChange
+            .sink { [weak self] in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
+
+    var statusLine: String { coordinator.statusLine }
+
+    func playPreviewSound() {
+        coordinator.playPreviewSound()
+    }
+
+    func checkForUpdatesNow() {
+        coordinator.checkForUpdatesNow()
+    }
+
+    func closeWindow() {
+        NSApp.keyWindow?.performClose(nil)
+    }
+}
+
+struct MenuBarQuickControlView: View {
+    @ObservedObject var viewModel: QuickControlViewModel
+    @State private var appeared = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("定时休息提醒器")
-                .font(.system(size: 28, weight: .bold))
-
-            Text(controller.statusLine)
-                .font(.headline)
-
-            HStack(spacing: 8) {
-                Button(controller.primaryActionTitle) {
-                    controller.startOrResume()
-                }
-                Button("暂停") {
-                    controller.pause()
-                }
-                Button("开始休息") {
-                    controller.beginBreakNow()
-                }
-                Button("稍后提醒") {
-                    controller.snooze()
-                }
-                Button("跳过本次") {
-                    controller.skipCurrentBreak()
-                }
+        VStack(alignment: .leading, spacing: 10) {
+            animatedRow(delay: 0.00) {
+                Text(viewModel.statusLine)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            SettingsView(store: controller.settingsStore) {
-                controller.playPreviewSound()
+            animatedRow(delay: 0.04) {
+                HStack(spacing: 8) {
+                    Button(viewModel.primaryActionTitle) {
+                        viewModel.startOrResume()
+                    }
+                    Button("暂停") {
+                        viewModel.pause()
+                    }
+                }
+                .buttonStyle(PressScaleButtonStyle())
             }
 
-            HStack(spacing: 10) {
+            animatedRow(delay: 0.08) {
+                HStack(spacing: 8) {
+                    Button("开始休息") {
+                        viewModel.beginBreakNow()
+                    }
+                    Button("稍后提醒") {
+                        viewModel.snooze()
+                    }
+                    Button("跳过本次") {
+                        viewModel.skipCurrentBreak()
+                    }
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+
+            Divider()
+
+            animatedRow(delay: 0.12) {
+                Button("打开设置") {
+                    viewModel.openSettingsWindow()
+                }
+                .buttonStyle(PressScaleButtonStyle())
+            }
+
+            animatedRow(delay: 0.16) {
                 Button("立即检查更新") {
-                    controller.checkForUpdatesNow()
+                    viewModel.checkForUpdatesNow()
                 }
+                .buttonStyle(PressScaleButtonStyle())
+            }
 
-                Button("退出应用") {
-                    NSApp.terminate(nil)
+            animatedRow(delay: 0.20) {
+                Button("退出") {
+                    viewModel.quit()
                 }
+                .buttonStyle(PressScaleButtonStyle())
             }
         }
-        .padding(20)
-        .frame(minWidth: 760, minHeight: 620)
+        .padding(12)
+        .frame(minWidth: 350)
+        .onAppear { appeared = true }
+    }
+
+    @ViewBuilder
+    private func animatedRow<Content: View>(delay: Double, @ViewBuilder content: () -> Content) -> some View {
+        content()
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 8)
+            .animation(.easeOut(duration: 0.24).delay(delay), value: appeared)
+    }
+}
+
+struct PressScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
+@MainActor
+final class DesignAssetLoader {
+    static let shared = DesignAssetLoader()
+
+    private var isPrepared = false
+    private var titleFontName: String?
+    private var bodyFontName: String?
+
+    private init() {}
+
+    func prepare() {
+        guard !isPrepared else {
+            return
+        }
+        isPrepared = true
+
+        titleFontName = registerFont(name: "font_title")
+        bodyFontName = registerFont(name: "font_body")
+    }
+
+    func image(named name: String) -> NSImage? {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "DesignAssets") else {
+            return nil
+        }
+        return NSImage(contentsOf: url)
+    }
+
+    func titleFont(size: CGFloat) -> Font {
+        guard let titleFontName else {
+            return .system(size: size, weight: .bold)
+        }
+        return .custom(titleFontName, size: size)
+    }
+
+    func bodyFont(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        guard let bodyFontName else {
+            return .system(size: size, weight: weight)
+        }
+        return .custom(bodyFontName, size: size)
+    }
+
+    private func registerFont(name: String) -> String? {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "ttf", subdirectory: "DesignAssets") else {
+            return nil
+        }
+
+        CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+
+        guard let descriptors = CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor],
+              let descriptor = descriptors.first,
+              let postScriptName = CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute) as? String else {
+            return nil
+        }
+
+        return postScriptName
     }
 }

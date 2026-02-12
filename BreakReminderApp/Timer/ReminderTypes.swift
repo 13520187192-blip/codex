@@ -21,9 +21,9 @@ public enum ReminderSoundOption: String, CaseIterable, Equatable {
 }
 
 public struct ReminderConfig: Equatable {
-    public static let workDurationRange = 15...120
-    public static let breakDurationRange = 3...30
-    public static let snoozeRange = 1...30
+    public static let workDurationRange = 1...60
+    public static let breakDurationRange = 1...60
+    public static let snoozeRange = 1...60
     public static let soundVolumeRange: ClosedRange<Double> = 0...1
 
     public var workDurationMinutes: Int

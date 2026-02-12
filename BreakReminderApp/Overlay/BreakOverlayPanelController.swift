@@ -53,6 +53,7 @@ private struct BreakOverlayView: View {
     let onStartBreak: () -> Void
     let onSnooze: () -> Void
     let onSkip: () -> Void
+    @State private var appeared = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -80,5 +81,11 @@ private struct BreakOverlayView: View {
         }
         .padding(20)
         .frame(width: 380, height: 220)
+        .scaleEffect(appeared ? 1 : 0.94)
+        .opacity(appeared ? 1 : 0)
+        .onAppear {
+            appeared = true
+        }
+        .animation(.spring(response: 0.28, dampingFraction: 0.86), value: appeared)
     }
 }

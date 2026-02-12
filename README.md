@@ -1,13 +1,13 @@
 # Break Reminder (macOS)
 
 一个休息提醒器仓库，包含：
-- `BreakReminderApp`：macOS 原生 SwiftUI 桌面窗口应用
+- `BreakReminderApp`：macOS 原生 SwiftUI 菜单栏应用（可弹出设置窗口）
 - `BreakReminderWindows`：Windows 托盘应用（WinForms）
 
 ## 功能
 
 - 菜单栏常驻
-- 默认每 30 分钟提醒休息 5 分钟（可配置）
+- 默认每 30 分钟提醒休息 5 分钟（可配置，范围 1~60 分钟）
 - 系统通知 + 强提醒置顶弹窗
 - 多种提示音可选，支持音量调节和试听
 - 支持稍后提醒、跳过本次、暂停/恢复
@@ -25,6 +25,30 @@ Windows（在 Windows 机器）：
 ```powershell
 dotnet build BreakReminderWindows/BreakReminderWindows.csproj -c Release
 ```
+
+## macOS 使用
+
+1. 启动后应用常驻在菜单栏（时钟图标）。
+2. 点击菜单栏图标可直接开始/暂停/稍后提醒/跳过本次。
+3. 点击“打开设置”会弹出独立设置窗口。
+4. 关闭设置窗口后应用不会退出，仍在菜单栏继续提醒。
+
+## 设计资源替换（给设计师）
+
+设计师只需要修改这个目录：`BreakReminderApp/DesignAssets/`
+
+- `hero.png`
+- `bg_pattern.png`
+- `icon_clock.png`
+- `font_title.ttf`
+- `font_body.ttf`
+
+规则：
+
+1. 文件名必须保持不变。
+2. 后缀必须保持不变。
+3. 设计师改完后，直接把整个 `DesignAssets` 文件夹回传。
+4. 程序会自动加载新素材；缺失素材时自动回退默认样式。
 
 ## 与 GitHub 同步
 
@@ -63,3 +87,5 @@ git push -u origin main
 ```bash
 xattr -dr com.apple.quarantine /Applications/BreakReminder.app
 ```
+
+如果看不到主窗口，这是正常现象：默认是菜单栏应用，请点击右上角菜单栏时钟图标打开设置窗口。
