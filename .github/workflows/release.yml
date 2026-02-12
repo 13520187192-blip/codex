@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: macos-14
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Build release artifact
+        run: scripts/package_release.sh "${VERSION}"
+
+      - name: Generate appcast
+        env:
+          DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/BreakReminder-${{ env.VERSION }}.zip
+          SPARKLE_ED_SIGNATURE: ${{ secrets.SPARKLE_ED_SIGNATURE }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_SIGN_TOOL: ${{ secrets.SPARKLE_SIGN_TOOL }}
+        run: scripts/generate_appcast.sh "${VERSION}" "dist/BreakReminder-${VERSION}.zip"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/BreakReminder-${{ env.VERSION }}.zip
+            dist/BreakReminder-${{ env.VERSION }}.zip.sha256
+
+      - name: Publish appcast to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./dist
+          keep_files: true
