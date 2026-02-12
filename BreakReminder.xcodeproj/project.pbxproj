@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		035EDEF26DAE974B956E981D /* ReminderStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C875649E8BC661F637023F /* ReminderStateMachine.swift */; };
 		0AE01BF6ED449BCE0C938176 /* reminder.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 8888439F9399681C9B08B78C /* reminder.aiff */; };
+		A1B2C3D4E5F60718293A4B5C /* NeoNoirTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* NeoNoirTheme.swift */; };
 		108565BCDE07271BCF650B6A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09D9FCD673FA5C08291185A0 /* Cocoa.framework */; };
 		12329255106985DCAC473108 /* hero.png in Resources */ = {isa = PBXBuildFile; fileRef = 08BBEE891B0364AD3849ABC5 /* hero.png */; };
 		247BB6A21C441DD7734C2CE3 /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD32FA2C36230BC84CEDEF73 /* SoundPlayer.swift */; };
@@ -69,6 +70,7 @@
 		7628010D7D30E9BF122D0AA0 /* UpdaterController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UpdaterController.swift; sourceTree = "<group>"; };
 		8888439F9399681C9B08B78C /* reminder.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = reminder.aiff; sourceTree = "<group>"; };
 		8F4A33388EB48671CC8BECBB /* font_body.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = font_body.ttf; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5D /* NeoNoirTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NeoNoirTheme.swift; sourceTree = "<group>"; };
 		ACAFEF39DE7DF522EDB69CB5 /* UpdateVersionComparator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UpdateVersionComparator.swift; sourceTree = "<group>"; };
 		B83281305E18223F637DE60A /* ReminderEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReminderEngine.swift; sourceTree = "<group>"; };
 		BBECCA08B39E823567425EEA /* MenuBarController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				399BCCF5A33CFB2AA329BF05 /* icon_clock.png */,
 				17A156C90C158820E21C4659 /* font_title.ttf */,
 				8F4A33388EB48671CC8BECBB /* font_body.ttf */,
+				A1B2C3D4E5F60718293A4B5D /* NeoNoirTheme.swift */,
 			);
 			name = DesignAssets;
 			path = DesignAssets;
@@ -396,6 +399,7 @@
 				247BB6A21C441DD7734C2CE3 /* SoundPlayer.swift in Sources */,
 				CD63D8E7F6E8DD35F494BD90 /* SettingsStore.swift in Sources */,
 				6D9738BC2DA6D69BE26F2F3A /* SettingsView.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* NeoNoirTheme.swift in Sources */,
 				E4B0A712FE2712A324E0A9EA /* UpdaterController.swift in Sources */,
 				F5A8EA0E21D6CE256E2CF7F0 /* UpdateVersionComparator.swift in Sources */,
 			);

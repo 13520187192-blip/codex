@@ -49,7 +49,17 @@ ZIP_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.zip"
 ditto -c -k --keepParent "${APP_PATH}" "${ZIP_PATH}"
 shasum -a 256 "${ZIP_PATH}" > "${ZIP_PATH}.sha256"
 
+DMG_SRC_DIR="${BUILD_DIR}/dmg-src"
+DMG_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.dmg"
+rm -rf "${DMG_SRC_DIR}"
+mkdir -p "${DMG_SRC_DIR}"
+cp -R "${APP_PATH}" "${DMG_SRC_DIR}/"
+hdiutil create -volname "${APP_NAME}" -srcfolder "${DMG_SRC_DIR}" -ov -format UDZO "${DMG_PATH}"
+shasum -a 256 "${DMG_PATH}" > "${DMG_PATH}.sha256"
+
 echo "Packaged ${ZIP_PATH}"
+echo "Packaged ${DMG_PATH}"
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "zip_path=${ZIP_PATH}" >> "${GITHUB_OUTPUT}"
+  echo "dmg_path=${DMG_PATH}" >> "${GITHUB_OUTPUT}"
 fi

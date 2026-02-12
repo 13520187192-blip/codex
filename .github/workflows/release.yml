@@ -36,6 +36,8 @@ jobs:
           files: |
             dist/BreakReminder-${{ env.VERSION }}.zip
             dist/BreakReminder-${{ env.VERSION }}.zip.sha256
+            dist/BreakReminder-${{ env.VERSION }}.dmg
+            dist/BreakReminder-${{ env.VERSION }}.dmg.sha256
 
       - name: Publish appcast to gh-pages
         uses: peaceiris/actions-gh-pages@v4

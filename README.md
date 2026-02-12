@@ -50,6 +50,13 @@ dotnet build BreakReminderWindows/BreakReminderWindows.csproj -c Release
 3. 设计师改完后，直接把整个 `DesignAssets` 文件夹回传。
 4. 程序会自动加载新素材；缺失素材时自动回退默认样式。
 
+给设计师的标准说明与可复制提示词：
+
+- `BreakReminderApp/DesignAssets/AI_DESIGN_HANDOFF_ZH.md`
+- `BreakReminderApp/DesignAssets/COPY_TO_DESIGN_AI.txt`
+- `BreakReminderApp/DesignAssets/UI_MODULE_MAP_FOR_DESIGN_ZH.md`
+- `BreakReminderApp/DesignAssets/COPY_THIS_TO_UI_AI_ZH.txt`
+
 ## 与 GitHub 同步
 
 ```bash
@@ -66,6 +73,7 @@ git push -u origin main
 1. 创建并推送版本标签：`v1.0.0`
 2. GitHub Actions 自动执行（macOS + Windows）：
 - 构建产物 `BreakReminder-1.0.0.zip`
+- 构建产物 `BreakReminder-1.0.0.dmg`
 - 构建产物 `BreakReminderWindows-1.0.0-win-x64.zip`
 - 生成 `appcast.xml`
 - 发布 GitHub Release
