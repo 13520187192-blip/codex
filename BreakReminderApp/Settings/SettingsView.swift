@@ -226,128 +226,122 @@ struct SettingsPanelView: View {
     var onPreviewSound: () -> Void
     
     var body: some View {
-        GroupBox {
-            Form {
-                Section {
-                    Stepper(value: $store.workDurationMinutes, in: ReminderConfig.workDurationRange) {
-                        SettingRowLabel(title: "提醒间隔", value: "\(store.workDurationMinutes) 分钟")
-                    }
-                    
-                    Stepper(value: $store.breakDurationMinutes, in: ReminderConfig.breakDurationRange) {
-                        SettingRowLabel(title: "休息时长", value: "\(store.breakDurationMinutes) 分钟")
-                    }
-                    
-                    Stepper(value: $store.snoozeMinutes, in: ReminderConfig.snoozeRange) {
-                        SettingRowLabel(title: "稍后提醒", value: "\(store.snoozeMinutes) 分钟")
-                    }
-                } header: {
-                    Text("时间设置（1~60 分钟）")
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(0.8)
-                        .foregroundColor(.sunsetOrange)
-                        .textCase(.uppercase)
-                }
-                
-                Section {
-                    Toggle("启用提示音", isOn: $store.soundEnabled)
-                        .toggleStyle(SunsetToggleStyle())
-                    
-                    Picker("提示音类型", selection: $store.soundOptionRawValue) {
-                        ForEach(ReminderSoundOption.allCases, id: \.rawValue) { option in
-                            Text(option.displayName).tag(option.rawValue)
-                        }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("音量")
-                            .font(.system(size: 12))
-                            .foregroundColor(.white.opacity(0.7))
-                        
-                        HStack {
-                            Slider(value: $store.soundVolume, in: ReminderConfig.soundVolumeRange, step: 0.05)
-                                .tint(Color.sunsetOrange)
-                            
-                            Text("\(Int(store.soundVolume * 100))%")
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundColor(.white.opacity(0.6))
-                                .frame(width: 40)
-                        }
-                    }
-                    
-                    Button("试听提示音") {
-                        onPreviewSound()
-                    }
-                    .buttonStyle(SunsetGlowButtonStyle(isPrimary: false, accentColor: .neonCyan))
-                } header: {
-                    Text("提示音")
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(0.8)
-                        .foregroundColor(.sunsetOrange)
-                        .textCase(.uppercase)
-                }
-                
-                Section {
-                    Toggle("系统通知", isOn: $store.enableSystemNotification)
-                        .toggleStyle(SunsetToggleStyle())
-                    Toggle("弹窗提醒", isOn: $store.enableOverlayPopup)
-                        .toggleStyle(SunsetToggleStyle())
-                    Toggle("强制弹窗（置顶）", isOn: $store.forceBreakPopup)
-                        .toggleStyle(SunsetToggleStyle())
-                } header: {
-                    Text("弹窗与通知")
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(0.8)
-                        .foregroundColor(.sunsetOrange)
-                        .textCase(.uppercase)
-                }
-            }
-            .font(DesignAssetLoader.shared.bodyFont(size: 13))
-            .foregroundColor(.white.opacity(0.85))
-        } label: {
+        VStack(alignment: .leading, spacing: 12) {
             Text("提醒参数")
                 .font(.system(size: 12, weight: .bold))
                 .tracking(1.5)
                 .foregroundColor(.white)
                 .textCase(.uppercase)
+
+            SettingsSectionCard(title: "时间设置（1~60 分钟）") {
+                StepperControlRow(title: "提醒间隔", value: $store.workDurationMinutes, range: ReminderConfig.workDurationRange)
+                StepperControlRow(title: "休息时长", value: $store.breakDurationMinutes, range: ReminderConfig.breakDurationRange)
+                StepperControlRow(title: "稍后提醒", value: $store.snoozeMinutes, range: ReminderConfig.snoozeRange)
+            }
+
+            SettingsSectionCard(title: "提示音") {
+                Toggle("启用提示音", isOn: $store.soundEnabled)
+                    .toggleStyle(SunsetToggleStyle())
+
+                HStack(spacing: 12) {
+                    Text("提示音类型")
+                        .foregroundColor(.white.opacity(0.9))
+                    Spacer(minLength: 20)
+                    Picker("", selection: $store.soundOptionRawValue) {
+                        ForEach(ReminderSoundOption.allCases, id: \.rawValue) { option in
+                            Text(option.displayName).tag(option.rawValue)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 150)
+                }
+
+                HStack(spacing: 12) {
+                    Text("音量")
+                        .foregroundColor(.white.opacity(0.9))
+                    Slider(value: $store.soundVolume, in: ReminderConfig.soundVolumeRange, step: 0.05)
+                        .tint(Color.sunsetOrange)
+                    Text("\(Int(store.soundVolume * 100))%")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.65))
+                        .frame(width: 44, alignment: .trailing)
+                }
+
+                HStack {
+                    Spacer()
+                    Button("试听提示音") {
+                        onPreviewSound()
+                    }
+                    .buttonStyle(SunsetGlowButtonStyle(isPrimary: false, accentColor: .neonCyan))
+                    .frame(width: 150)
+                }
+            }
+
+            SettingsSectionCard(title: "弹窗与通知") {
+                Toggle("系统通知", isOn: $store.enableSystemNotification)
+                    .toggleStyle(SunsetToggleStyle())
+                Toggle("弹窗提醒", isOn: $store.enableOverlayPopup)
+                    .toggleStyle(SunsetToggleStyle())
+                Toggle("强制弹窗（置顶）", isOn: $store.forceBreakPopup)
+                    .toggleStyle(SunsetToggleStyle())
+            }
         }
-        .groupBoxStyle(NeoNoirGroupBoxStyle())
+        .font(DesignAssetLoader.shared.bodyFont(size: 13))
+        .foregroundColor(.white.opacity(0.85))
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
 // MARK: - 辅助组件
 
-private struct SettingRowLabel: View {
+private struct SettingsSectionCard<Content: View>: View {
     let title: String
-    let value: String
-    
+    let content: Content
+
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .foregroundColor(.white.opacity(0.9))
-            Spacer()
-            Text(value)
-                .font(.system(size: 12, design: .monospaced))
                 .foregroundColor(.sunsetOrange)
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(0.8)
+                .textCase(.uppercase)
+                .padding(.bottom, 2)
+
+            content
         }
+        .padding(14)
+        .background(Color.bgCard.opacity(0.4))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .cornerRadius(8)
     }
 }
 
-// MARK: - 自定义样式
+private struct StepperControlRow: View {
+    let title: String
+    @Binding var value: Int
+    let range: ClosedRange<Int>
 
-private struct NeoNoirGroupBoxStyle: GroupBoxStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            configuration.label
-                .padding(.horizontal, 4)
-            
-            configuration.content
-                .padding(16)
-                .background(Color.bgCard.opacity(0.4))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-                )
-                .cornerRadius(8)
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(title)
+                .foregroundColor(.white.opacity(0.9))
+            Spacer(minLength: 20)
+            Text("\(value) 分钟")
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundColor(.sunsetOrange)
+                .frame(width: 70, alignment: .trailing)
+            Stepper("", value: $value, in: range)
+                .labelsHidden()
+                .frame(width: 84)
         }
     }
 }
