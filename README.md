@@ -57,3 +57,9 @@ git push -u origin main
 ## 权限
 
 首次运行需要允许通知权限，未签名版本在 macOS 下可能出现安全提示。
+
+如果 macOS 提示“文件已损坏/无法验证开发者”，请在终端执行：
+
+```bash
+xattr -dr com.apple.quarantine /Applications/BreakReminder.app
+```

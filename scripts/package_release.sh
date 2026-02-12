@@ -31,6 +31,8 @@ xcodebuild \
   -scheme "${SCHEME}" \
   -configuration Release \
   -derivedDataPath "${BUILD_DIR}" \
+  ARCHS="arm64 x86_64" \
+  ONLY_ACTIVE_ARCH=NO \
   CODE_SIGNING_ALLOWED=NO \
   clean build
 
@@ -39,6 +41,9 @@ if [[ ! -d "${APP_PATH}" ]]; then
   echo "Build succeeded but ${APP_PATH} not found."
   exit 1
 fi
+
+/usr/bin/codesign --force --deep --sign - "${APP_PATH}"
+/usr/bin/codesign --verify --deep --strict --verbose=2 "${APP_PATH}"
 
 ZIP_PATH="${DIST_DIR}/${APP_NAME}-${VERSION}.zip"
 ditto -c -k --keepParent "${APP_PATH}" "${ZIP_PATH}"
