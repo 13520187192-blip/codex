@@ -180,6 +180,17 @@ final class ReminderCoordinator: ObservableObject {
     }
     
     func checkForUpdatesNow() { updater.checkForUpdatesManually() }
+
+    func quitApplication() {
+        let running = NSRunningApplication.current
+        NSApp.terminate(nil)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            if !running.isTerminated {
+                running.forceTerminate()
+            }
+        }
+    }
     
     func playPreviewSound() {
         let option = ReminderSoundOption(rawValue: settingsStore.soundOptionRawValue) ?? .glass
@@ -258,7 +269,7 @@ final class QuickControlViewModel: ObservableObject {
     func skipCurrentBreak() { coordinator.skipCurrentBreak() }
     func openSettingsWindow() { coordinator.openSettingsWindow() }
     func checkForUpdatesNow() { coordinator.checkForUpdatesNow() }
-    func quit() { NSApp.terminate(nil) }
+    func quit() { coordinator.quitApplication() }
 }
 
 @MainActor
@@ -278,6 +289,7 @@ final class SettingsViewModel: ObservableObject {
     var statusLine: String { coordinator.statusLine }
     func playPreviewSound() { coordinator.playPreviewSound() }
     func checkForUpdatesNow() { coordinator.checkForUpdatesNow() }
+    func quitApplication() { coordinator.quitApplication() }
     func closeWindow() { NSApp.keyWindow?.performClose(nil) }
 }
 

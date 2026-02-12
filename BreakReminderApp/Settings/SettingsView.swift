@@ -86,6 +86,11 @@ struct SettingsWindowView: View {
                 }
                 
                 HStack(spacing: 12) {
+                    Button("退出应用") {
+                        viewModel.quitApplication()
+                    }
+                    .buttonStyle(NightOutlineButtonStyle())
+
                     Button("检查更新") {
                         viewModel.checkForUpdatesNow()
                     }
