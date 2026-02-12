@@ -34,8 +34,33 @@ public final class SettingsStore: ObservableObject {
         didSet { persistIfNeeded() }
     }
 
+    @Published public var forceBreakPopup: Bool {
+        didSet { persistIfNeeded() }
+    }
+
     @Published public var soundEnabled: Bool {
         didSet { persistIfNeeded() }
+    }
+
+    @Published public var soundOptionRawValue: String {
+        didSet {
+            if ReminderSoundOption(rawValue: soundOptionRawValue) == nil {
+                soundOptionRawValue = ReminderSoundOption.glass.rawValue
+                return
+            }
+            persistIfNeeded()
+        }
+    }
+
+    @Published public var soundVolume: Double {
+        didSet {
+            let clamped = ReminderConfig.clamp(soundVolume, range: ReminderConfig.soundVolumeRange)
+            if clamped != soundVolume {
+                soundVolume = clamped
+                return
+            }
+            persistIfNeeded()
+        }
     }
 
     @Published public var snoozeMinutes: Int {
@@ -55,7 +80,10 @@ public final class SettingsStore: ObservableObject {
             breakDurationMinutes: breakDurationMinutes,
             enableSystemNotification: enableSystemNotification,
             enableOverlayPopup: enableOverlayPopup,
+            forceBreakPopup: forceBreakPopup,
             soundEnabled: soundEnabled,
+            soundOption: ReminderSoundOption(rawValue: soundOptionRawValue) ?? .glass,
+            soundVolume: soundVolume,
             snoozeMinutes: snoozeMinutes
         ).sanitized()
     }
@@ -68,7 +96,10 @@ public final class SettingsStore: ObservableObject {
         static let breakDurationMinutes = "break_reminder.break_duration_minutes"
         static let enableSystemNotification = "break_reminder.enable_system_notification"
         static let enableOverlayPopup = "break_reminder.enable_overlay_popup"
+        static let forceBreakPopup = "break_reminder.force_break_popup"
         static let soundEnabled = "break_reminder.sound_enabled"
+        static let soundOptionRawValue = "break_reminder.sound_option"
+        static let soundVolume = "break_reminder.sound_volume"
         static let snoozeMinutes = "break_reminder.snooze_minutes"
     }
 
@@ -80,7 +111,10 @@ public final class SettingsStore: ObservableObject {
             breakDurationMinutes: userDefaults.object(forKey: Keys.breakDurationMinutes) as? Int ?? 5,
             enableSystemNotification: userDefaults.object(forKey: Keys.enableSystemNotification) as? Bool ?? true,
             enableOverlayPopup: userDefaults.object(forKey: Keys.enableOverlayPopup) as? Bool ?? true,
+            forceBreakPopup: userDefaults.object(forKey: Keys.forceBreakPopup) as? Bool ?? false,
             soundEnabled: userDefaults.object(forKey: Keys.soundEnabled) as? Bool ?? true,
+            soundOption: ReminderSoundOption(rawValue: userDefaults.object(forKey: Keys.soundOptionRawValue) as? String ?? "") ?? .glass,
+            soundVolume: userDefaults.object(forKey: Keys.soundVolume) as? Double ?? 0.8,
             snoozeMinutes: userDefaults.object(forKey: Keys.snoozeMinutes) as? Int ?? 5
         ).sanitized()
 
@@ -88,7 +122,10 @@ public final class SettingsStore: ObservableObject {
         breakDurationMinutes = initialConfig.breakDurationMinutes
         enableSystemNotification = initialConfig.enableSystemNotification
         enableOverlayPopup = initialConfig.enableOverlayPopup
+        forceBreakPopup = initialConfig.forceBreakPopup
         soundEnabled = initialConfig.soundEnabled
+        soundOptionRawValue = initialConfig.soundOption.rawValue
+        soundVolume = initialConfig.soundVolume
         snoozeMinutes = initialConfig.snoozeMinutes
 
         persistIfNeeded(force: true)
@@ -102,7 +139,10 @@ public final class SettingsStore: ObservableObject {
         breakDurationMinutes = safeConfig.breakDurationMinutes
         enableSystemNotification = safeConfig.enableSystemNotification
         enableOverlayPopup = safeConfig.enableOverlayPopup
+        forceBreakPopup = safeConfig.forceBreakPopup
         soundEnabled = safeConfig.soundEnabled
+        soundOptionRawValue = safeConfig.soundOption.rawValue
+        soundVolume = safeConfig.soundVolume
         snoozeMinutes = safeConfig.snoozeMinutes
 
         isApplying = false
@@ -120,7 +160,10 @@ public final class SettingsStore: ObservableObject {
         defaults.set(safeConfig.breakDurationMinutes, forKey: Keys.breakDurationMinutes)
         defaults.set(safeConfig.enableSystemNotification, forKey: Keys.enableSystemNotification)
         defaults.set(safeConfig.enableOverlayPopup, forKey: Keys.enableOverlayPopup)
+        defaults.set(safeConfig.forceBreakPopup, forKey: Keys.forceBreakPopup)
         defaults.set(safeConfig.soundEnabled, forKey: Keys.soundEnabled)
+        defaults.set(safeConfig.soundOption.rawValue, forKey: Keys.soundOptionRawValue)
+        defaults.set(safeConfig.soundVolume, forKey: Keys.soundVolume)
         defaults.set(safeConfig.snoozeMinutes, forKey: Keys.snoozeMinutes)
 
         onConfigChanged?(safeConfig)

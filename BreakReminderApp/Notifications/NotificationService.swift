@@ -20,7 +20,7 @@ final class NotificationService: NotificationServicing {
         let content = UNMutableNotificationContent()
         content.title = "休息提醒"
         content.body = "你已经专注一段时间了，该休息一下。"
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("reminder.aiff"))
+        content.sound = nil
 
         let request = UNNotificationRequest(
             identifier: "break_due_\(UUID().uuidString)",
@@ -35,7 +35,7 @@ final class NotificationService: NotificationServicing {
         let content = UNMutableNotificationContent()
         content.title = "开始休息"
         content.body = "本次休息建议时长 \(durationMinutes) 分钟。"
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("reminder.aiff"))
+        content.sound = nil
 
         let request = UNNotificationRequest(
             identifier: "break_started_\(UUID().uuidString)",

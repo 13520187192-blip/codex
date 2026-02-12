@@ -1,46 +1,28 @@
 import AppKit
-import Combine
 import Foundation
 import SwiftUI
 
 protocol SoundPlaying {
-    func playReminder()
+    func playReminder(option: ReminderSoundOption, volume: Double)
 }
 
 protocol BreakOverlayPresenting: AnyObject {
-    func showBreakDue(onStartBreak: @escaping () -> Void, onSnooze: @escaping () -> Void, onSkip: @escaping () -> Void)
+    func showBreakDue(forceBreakPopup: Bool, onStartBreak: @escaping () -> Void, onSnooze: @escaping () -> Void, onSkip: @escaping () -> Void)
     func dismiss()
 }
 
 @MainActor
-final class MenuBarController: ObservableObject {
+final class AppController: ObservableObject {
     @Published private(set) var currentState: ReminderState = .idle
 
     let settingsStore: SettingsStore
-
-    var menuBarSymbolName: String {
-        switch currentState {
-        case .idle:
-            return "figure.walk"
-        case .focusing:
-            return "timer"
-        case .breakDue:
-            return "exclamationmark.circle.fill"
-        case .onBreak:
-            return "cup.and.saucer.fill"
-        case .snoozed:
-            return "zzz"
-        case .paused:
-            return "pause.circle"
-        }
-    }
 
     var primaryActionTitle: String {
         switch currentState {
         case .idle:
             return "开始专注"
         case .paused:
-            return "恢复"
+            return "恢复专注"
         default:
             return "重新开始"
         }
@@ -151,13 +133,13 @@ final class MenuBarController: ObservableObject {
         engine.snooze(minutes: settingsStore.snoozeMinutes)
     }
 
-    func openSettings() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate(ignoringOtherApps: true)
-    }
-
     func checkForUpdatesNow() {
         updater.checkForUpdatesManually()
+    }
+
+    func playPreviewSound() {
+        let option = ReminderSoundOption(rawValue: settingsStore.soundOptionRawValue) ?? .glass
+        soundPlayer.playReminder(option: option, volume: settingsStore.soundVolume)
     }
 
     private func handleStateChange(_ nextState: ReminderState) {
@@ -166,13 +148,14 @@ final class MenuBarController: ObservableObject {
         switch nextState {
         case .breakDue:
             if settingsStore.soundEnabled {
-                soundPlayer.playReminder()
+                playPreviewSound()
             }
             if settingsStore.enableSystemNotification {
                 notifier.showBreakDueNotification()
             }
             if settingsStore.enableOverlayPopup {
                 overlay.showBreakDue(
+                    forceBreakPopup: settingsStore.forceBreakPopup,
                     onStartBreak: { [weak self] in self?.beginBreakNow() },
                     onSnooze: { [weak self] in self?.snooze() },
                     onSkip: { [weak self] in self?.skipCurrentBreak() }
@@ -196,14 +179,16 @@ final class MenuBarController: ObservableObject {
     }
 }
 
-struct MenuBarContentView: View {
-    @ObservedObject var controller: MenuBarController
+struct MainWindowView: View {
+    @ObservedObject var controller: AppController
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("定时休息提醒器")
+                .font(.system(size: 28, weight: .bold))
+
             Text(controller.statusLine)
                 .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: 8) {
                 Button(controller.primaryActionTitle) {
@@ -212,9 +197,6 @@ struct MenuBarContentView: View {
                 Button("暂停") {
                     controller.pause()
                 }
-            }
-
-            HStack(spacing: 8) {
                 Button("开始休息") {
                     controller.beginBreakNow()
                 }
@@ -226,19 +208,21 @@ struct MenuBarContentView: View {
                 }
             }
 
-            Divider()
+            SettingsView(store: controller.settingsStore) {
+                controller.playPreviewSound()
+            }
 
-            Button("打开设置") {
-                controller.openSettings()
-            }
-            Button("立即检查更新") {
-                controller.checkForUpdatesNow()
-            }
-            Button("退出") {
-                NSApp.terminate(nil)
+            HStack(spacing: 10) {
+                Button("立即检查更新") {
+                    controller.checkForUpdatesNow()
+                }
+
+                Button("退出应用") {
+                    NSApp.terminate(nil)
+                }
             }
         }
-        .padding(12)
-        .frame(minWidth: 340)
+        .padding(20)
+        .frame(minWidth: 760, minHeight: 620)
     }
 }

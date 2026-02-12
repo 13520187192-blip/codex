@@ -2,16 +2,11 @@ import SwiftUI
 
 @main
 struct BreakReminderDesktopApp: App {
-    @StateObject private var controller = MenuBarController()
+    @StateObject private var controller = AppController()
 
     var body: some Scene {
-        MenuBarExtra("休息提醒", systemImage: controller.menuBarSymbolName) {
-            MenuBarContentView(controller: controller)
-        }
-        .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsView(store: controller.settingsStore)
+        WindowGroup("休息提醒") {
+            MainWindowView(controller: controller)
         }
     }
 }

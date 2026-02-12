@@ -4,7 +4,7 @@ import SwiftUI
 final class BreakOverlayPanelController: BreakOverlayPresenting {
     private var panel: NSPanel?
 
-    func showBreakDue(onStartBreak: @escaping () -> Void, onSnooze: @escaping () -> Void, onSkip: @escaping () -> Void) {
+    func showBreakDue(forceBreakPopup: Bool, onStartBreak: @escaping () -> Void, onSnooze: @escaping () -> Void, onSkip: @escaping () -> Void) {
         let contentView = BreakOverlayView(
             onStartBreak: {
                 onStartBreak()
@@ -20,18 +20,22 @@ final class BreakOverlayPanelController: BreakOverlayPresenting {
         if panel == nil {
             let panel = NSPanel(
                 contentRect: NSRect(x: 0, y: 0, width: 380, height: 220),
-                styleMask: [.titled, .closable],
+                styleMask: forceBreakPopup ? [.titled] : [.titled, .closable],
                 backing: .buffered,
                 defer: false
             )
             panel.title = "休息提醒"
-            panel.level = .statusBar
+            panel.level = forceBreakPopup ? .screenSaver : .statusBar
             panel.isFloatingPanel = true
             panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
             panel.hidesOnDeactivate = false
             panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
             panel.standardWindowButton(.zoomButton)?.isHidden = true
+            panel.standardWindowButton(.closeButton)?.isHidden = forceBreakPopup
             self.panel = panel
+        } else {
+            panel?.level = forceBreakPopup ? .screenSaver : .statusBar
+            panel?.standardWindowButton(.closeButton)?.isHidden = forceBreakPopup
         }
 
         panel?.contentView = NSHostingView(rootView: contentView)

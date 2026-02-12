@@ -1,7 +1,7 @@
 # Break Reminder (macOS)
 
 一个休息提醒器仓库，包含：
-- `BreakReminderApp`：macOS 原生 SwiftUI 菜单栏应用
+- `BreakReminderApp`：macOS 原生 SwiftUI 桌面窗口应用
 - `BreakReminderWindows`：Windows 托盘应用（WinForms）
 
 ## 功能
@@ -9,7 +9,7 @@
 - 菜单栏常驻
 - 默认每 30 分钟提醒休息 5 分钟（可配置）
 - 系统通知 + 强提醒置顶弹窗
-- 提示音提醒
+- 多种提示音可选，支持音量调节和试听
 - 支持稍后提醒、跳过本次、暂停/恢复
 - GitHub Release 自动发布
 - Sparkle 兼容的 appcast 更新元数据
