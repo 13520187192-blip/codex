@@ -1,6 +1,8 @@
 # Break Reminder (macOS)
 
-一个原生 SwiftUI 的 macOS 菜单栏休息提醒器。
+一个休息提醒器仓库，包含：
+- `BreakReminderApp`：macOS 原生 SwiftUI 菜单栏应用
+- `BreakReminderWindows`：Windows 托盘应用（WinForms）
 
 ## 功能
 
@@ -18,6 +20,12 @@
 swift test
 ```
 
+Windows（在 Windows 机器）：
+
+```powershell
+dotnet build BreakReminderWindows/BreakReminderWindows.csproj -c Release
+```
+
 ## 与 GitHub 同步
 
 ```bash
@@ -32,8 +40,9 @@ git push -u origin main
 ## 发布流程
 
 1. 创建并推送版本标签：`v1.0.0`
-2. GitHub Actions 自动执行：
+2. GitHub Actions 自动执行（macOS + Windows）：
 - 构建产物 `BreakReminder-1.0.0.zip`
+- 构建产物 `BreakReminderWindows-1.0.0-win-x64.zip`
 - 生成 `appcast.xml`
 - 发布 GitHub Release
 - 同步 `dist/` 到 `gh-pages`
