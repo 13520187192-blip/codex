@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="BreakReminder"
-TARGET="BreakReminder"
+SCHEME="BreakReminder"
 PROJECT_PATH="BreakReminder.xcodeproj"
 BUILD_DIR="build"
 DIST_DIR="dist"
@@ -28,7 +28,7 @@ mkdir -p "${DIST_DIR}"
 
 xcodebuild \
   -project "${PROJECT_PATH}" \
-  -target "${TARGET}" \
+  -scheme "${SCHEME}" \
   -configuration Release \
   -derivedDataPath "${BUILD_DIR}" \
   CODE_SIGNING_ALLOWED=NO \
